@@ -1,5 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:phil/methods/methods.dart';
+import 'package:phil/models/commerciaux.dart';
+import 'package:phil/pages/CommsTab.dart';
 import 'package:phil/pages/page_detail_commerciaux.dart';
 import 'package:phil/provider/queries_provider.dart';
 
@@ -13,6 +15,8 @@ class PageCommerciaux extends StatefulWidget {
 class _PageCommerciauxState extends State<PageCommerciaux> {
 
   List<Map<String, dynamic>> listCom = [];
+  List<Comms> commerciaux = [];
+  Comms cm = Comms();
   bool gotData = true;
   bool getDataError = false;
   late final QueriesProvider _provider;
@@ -49,10 +53,12 @@ class _PageCommerciauxState extends State<PageCommerciaux> {
 
     await _provider.fetchCommerciaux(
         secure: false,
-        onSuccess: (commerciaux)
+        onSuccess: (cms)
         {
-          listCom = commerciaux;
-
+          listCom = cms;
+          for (var element in cms) {
+            commerciaux.add(Comms.MapComm(element));
+          }
 
             setState(() {
               gotData = false;
@@ -113,24 +119,24 @@ class _PageCommerciauxState extends State<PageCommerciaux> {
         itemCount: listCom.length,
         itemBuilder: (BuildContext c, int index)
         {
-          return listeCommerciaux(listCom[index]);
+          return listeCommerciaux(commerciaux[index]);
         }
     );
 
   }
   //Widget de la liste
-  Widget listeCommerciaux(Map<String, dynamic> com) {
+  Widget listeCommerciaux(Comms com) {
 
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: ListTile.selectable(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5), side: const BorderSide(color: Color(0xFF000000))),
         onPressed: (){
-          nextPage(context,   PageDetailsCommerciaux(commId: com['id'], commName: com['nom'],));
+          nextPage(context,   CommsTab(commId: com.id, commName: com.nomCommerciaux,));
         },
         leading: const Icon(FluentIcons.contact, size: 30,),
-        title: Text(com['nom'] ?? "Aucun nom", style: const TextStyle(fontSize: 20),),
-        subtitle: Text(com['id'], style: const TextStyle(fontSize: 15),),
+        title: Text(com.nomCommerciaux ?? "Aucun nom", style: const TextStyle(fontSize: 20),),
+        subtitle: Text(com.id, style: const TextStyle(fontSize: 15),),
       ),
 
     );

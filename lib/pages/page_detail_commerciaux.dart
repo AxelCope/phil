@@ -10,6 +10,7 @@ class PageDetailsCommerciaux extends StatefulWidget {
   final String? commId;
   final String? commName;
 
+
   @override
   State<PageDetailsCommerciaux> createState() => _PageDetailsCommerciauxState();
 }
@@ -23,12 +24,11 @@ class _PageDetailsCommerciauxState extends State<PageDetailsCommerciaux>{
   late final QueriesProvider _provider;
   late DotationProvider dv;
 
-  Dotations dt = Dotations(startDate: DateTime.parse(holDate), endDate: DateTime.parse(holDate2));
 
-  static DateTime? selected1 = DateTime(2023, 03, 13);
-  static DateTime? selected2 = DateTime.now();
-  static String holDate = "2023-03-13";
-  static String holDate2 = "${DateTime.now()}";
+    DateTime? selected1 = DateTime(2023, 03, 13);
+    DateTime? selected2 = DateTime.now();
+    String holDate = "2023-03-13";
+    String holDate2 = "${DateTime.now()}";
 
 
   @override
@@ -71,30 +71,30 @@ class _PageDetailsCommerciauxState extends State<PageDetailsCommerciaux>{
             ),
             Center(
               child: Container(
-                width: 400,
+                width: 300,
                 child: Card(
-                  child: Wrap(
+                  child:  Wrap(
                     children: [
                       DatePicker(
-                        header: 'Date de début',
+                        header: 'Début',
                         selected: selected1,
                         onChanged: (time) => setState(() {
                           selected1 = time;
-                          dt.startDate = time;
-                          holDate = '${dt.startDate?.year}-0${dt.startDate?.month}-${dt.startDate?.day}';
+                          holDate = '${selected1?.year}-${selected1?.month}-${selected1?.day}';
+                          print(holDate);
                           ListDotations.clear();
                           _fetchData();
                         }),
                       ),
-                      SizedBox(width: 20,),
+
 
                       DatePicker(
-                        header: 'Date de fin',
+                        header: 'Fin',
                         selected: selected2,
                         onChanged: (time) => setState(() {
-                          dt.endDate = time;
                           selected2 = time;
-                          holDate2 = '${ dt.endDate?.year}-0${ dt.endDate?.month}-${ dt.endDate?.day}';
+                          holDate2 = '${ selected2?.year}-${ selected2?.month}-${ selected2?.day}';
+                          print(holDate2);
                           ListDotations.clear();
                           _fetchData();
                         }),
@@ -104,6 +104,39 @@ class _PageDetailsCommerciauxState extends State<PageDetailsCommerciaux>{
                 ),
               ),
             ),
+
+             Wrap(
+               children: [
+                 Padding(
+                   padding: const EdgeInsets.all(8.0),
+                   child: Container(
+                    child: Column(
+                      children: [
+                        Text("Dotations journalière"),
+                        Card(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Text("12", style: TextStyle(fontSize: 20),),
+                        )
+                      ],
+                    )
+            ),
+                 ),
+                 Padding(
+                   padding: const EdgeInsets.all(8.0),
+                   child: Container(
+                    child: Column(
+                      children: [
+                        Text("Montant reconverti"),
+                        Card(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Text("3.000.000" ,style: TextStyle(fontSize: 20),),
+                        )
+                      ],
+                    )
+            ),
+                 ),
+               ]
+             )
           ]
       ),
     );
@@ -115,7 +148,7 @@ class _PageDetailsCommerciauxState extends State<PageDetailsCommerciaux>{
      var month = DateTime.parse(formattedString).month;
      var year = DateTime.parse(formattedString).year;
 
-     return "$day/$month/$year";
+     return "$day-$month-$year";
 
   }
 
@@ -127,8 +160,8 @@ class _PageDetailsCommerciauxState extends State<PageDetailsCommerciaux>{
   Future<void> _fetchData() async {
     dv.getAllDotation(
       //TODO set this to true
-      startDate: dt.startDate.toString(),
-      endDate: dt.endDate.toString(),
+      startDate: holDate,
+      endDate: holDate2,
       commId: widget.commId,
         secure: false,
         onSuccess: (r) {
