@@ -132,7 +132,7 @@ class _PageCommerciauxState extends State<PageCommerciaux> {
       child: ListTile.selectable(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5), side: const BorderSide(color: Color(0xFF000000))),
         onPressed: (){
-          nextPage(context,   CommsTab(commId: com.id, commName: com.nomCommerciaux,));
+          nextPage(context,   CommsTab(comms: com,));
         },
         leading: const Icon(FluentIcons.contact, size: 30,),
         title: Text(com.nomCommerciaux ?? "Aucun nom", style: const TextStyle(fontSize: 20),),

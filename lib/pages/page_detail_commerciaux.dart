@@ -1,14 +1,17 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:phil/models/commerciaux.dart';
 import 'package:phil/models/modeldotationsglobales.dart';
 import 'package:phil/provider/dotation_provider.dart';
 import 'package:phil/provider/queries_provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class PageDetailsCommerciaux extends StatefulWidget {
-  const PageDetailsCommerciaux({Key? key, this.commId, this.commName}) : super(key: key);
+  const PageDetailsCommerciaux({
+    Key? key,
+    required this.comms
+  }) : super(key: key);
 
-  final String? commId;
-  final String? commName;
+  final Comms comms;
 
 
   @override
@@ -24,9 +27,6 @@ class _PageDetailsCommerciauxState extends State<PageDetailsCommerciaux>{
   late final QueriesProvider _provider;
   late DotationProvider dv;
 
-
-    DateTime? selected1 = DateTime(2023, 03, 13);
-    DateTime? selected2 = DateTime.now();
     String holDate = "2023-03-13";
     String holDate2 = "${DateTime.now()}";
 
@@ -52,7 +52,7 @@ class _PageDetailsCommerciauxState extends State<PageDetailsCommerciaux>{
       content: ScaffoldPage.scrollable(
           children: [
             SfCartesianChart(
-                title: ChartTitle(text: "Dotation journalière de ${widget.commName}"),
+                title: ChartTitle(text: "Dotation journalière de ${widget.comms.nomCommerciaux}"),
                 tooltipBehavior: TooltipBehavior(enable: true),
                 legend: Legend(
                     isVisible: true
@@ -77,10 +77,12 @@ class _PageDetailsCommerciauxState extends State<PageDetailsCommerciaux>{
                     children: [
                       DatePicker(
                         header: 'Début',
-                        selected: selected1,
+                        selected: widget.comms.startDateTime,
                         onChanged: (time) => setState(() {
-                          selected1 = time;
-                          holDate = '${selected1?.year}-${selected1?.month}-${selected1?.day}';
+                          widget.comms.startDateTime = time;
+                          holDate = '${widget.comms.startDateTime?.year}-'
+                              '${widget.comms.startDateTime?.month}-'
+                              '${widget.comms.startDateTime?.day}';
                           print(holDate);
                           ListDotations.clear();
                           _fetchData();
@@ -90,10 +92,12 @@ class _PageDetailsCommerciauxState extends State<PageDetailsCommerciaux>{
 
                       DatePicker(
                         header: 'Fin',
-                        selected: selected2,
+                        selected: widget.comms.endDateTime,
                         onChanged: (time) => setState(() {
-                          selected2 = time;
-                          holDate2 = '${ selected2?.year}-${ selected2?.month}-${ selected2?.day}';
+                          widget.comms.endDateTime = time;
+                          holDate2 = '${ widget.comms.endDateTime?.year}-'
+                              '${ widget.comms.endDateTime?.month}-'
+                              '${ widget.comms.endDateTime?.day}';
                           print(holDate2);
                           ListDotations.clear();
                           _fetchData();
@@ -162,7 +166,7 @@ class _PageDetailsCommerciauxState extends State<PageDetailsCommerciaux>{
       //TODO set this to true
       startDate: holDate,
       endDate: holDate2,
-      commId: widget.commId,
+      commId: widget.comms.id,
         secure: false,
         onSuccess: (r) {
           setState(() {
