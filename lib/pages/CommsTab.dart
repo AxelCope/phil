@@ -1,12 +1,15 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:phil/models/commerciaux.dart';
 import 'package:phil/pages/page_commerciaux.dart';
 import 'package:phil/pages/page_detail_commerciaux.dart';
 import 'package:phil/pages/page_pointdeventes.dart';
 
 class CommsTab extends StatefulWidget {
-  const CommsTab({Key? key, this.commId, this.commName}) : super(key: key);
-  final String? commId;
-  final String? commName;
+  const CommsTab({
+    Key? key,
+    required this.comms
+  }) : super(key: key);
+  final Comms comms;
   @override
   State<CommsTab> createState() => _CommsTabState();
 }
@@ -32,7 +35,7 @@ class _CommsTabState extends State<CommsTab> {
 
           ],
         ),
-      ), body: PageDetailsCommerciaux(commId: widget.commId, commName: widget.commName,)),
+      ), body: PageDetailsCommerciaux(comms: widget.comms,)),
     //Tab(text: Text("Statistiques générales"), body: StatistiquesGenerales()),
     ]
       ),
