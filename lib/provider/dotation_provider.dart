@@ -35,10 +35,13 @@ class DotationProvider {
     ).exec(
         secure: secure,
         onSuccess: (Result result) {
+          // print("${DateTime.now().toString()}");
           List<Dotations> l = [];
           for (var element in result.data) {
             l.add(Dotations.MapDotations(element));
           }
+          // print("${DateTime.now().toString()}");
+
           onSuccess(l);
         },
         onError: onError

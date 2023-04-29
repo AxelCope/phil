@@ -1,16 +1,25 @@
 import '../provider/db_constants.dart';
 
 class Rec {
-  String? dotation;
+  double? reconversion;
+  String? date;
+  DateTime? startDateTime;
+  DateTime? endDateTime;
 
   Rec({
-    this.dotation,
+    this.reconversion,
+    this.startDateTime,
+    this.endDateTime,
+    this.date,
   });
 
 
   factory Rec.MapComm(Map<String, dynamic> map) {
     return Rec(
-      dotation: map[dbRec],
+      reconversion: map[dbRec],
+      date: map[dbDates],
+      startDateTime: DateTime(2023, 03, 13),
+      endDateTime: DateTime.now(),
     );
   }
 }

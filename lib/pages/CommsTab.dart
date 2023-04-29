@@ -1,7 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:phil/models/commerciaux.dart';
+import 'package:phil/models/model_commerciaux.dart';
+import 'package:phil/pages/comm_detailsTabs/details_activite.dart';
+import 'package:phil/pages/comm_detailsTabs/details_reconversion.dart';
 import 'package:phil/pages/page_commerciaux.dart';
-import 'package:phil/pages/page_detail_commerciaux.dart';
+import 'package:phil/pages/comm_detailsTabs//details_dotations.dart';
 import 'package:phil/pages/page_pointdeventes.dart';
 
 class CommsTab extends StatefulWidget {
@@ -23,6 +25,7 @@ class _CommsTabState extends State<CommsTab> {
   Widget build(BuildContext context) {
     return NavigationView(
       content: TabView(
+
           closeButtonVisibility: CloseVision,
           currentIndex: currentIndex,
           onChanged: (index) => setState(() => currentIndex = index),
@@ -31,11 +34,29 @@ class _CommsTabState extends State<CommsTab> {
         TextSpan(
           children: [
             TextSpan(text: 'Courbe des dotations    '),
-            WidgetSpan(child: Icon(FluentIcons.bar_chart4)),
+            WidgetSpan(child: Icon(FluentIcons.chart)),
 
           ],
         ),
-      ), body: PageDetailsCommerciaux(comms: widget.comms,)),
+      ), body: DetailsDotations(comms: widget.comms,)),
+            Tab(text: const Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: 'Courbe des reconversion    '),
+                  WidgetSpan(child: Icon(FluentIcons.bar_chart4)),
+
+                ],
+              ),
+            ), body: DetailsReconversion(comms: widget.comms,)),
+            Tab(text: const Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: "Taux d'activité    "),
+                  WidgetSpan(child: Icon(FluentIcons.custom_activity)),
+
+                ],
+              ),
+            ), body: ActiviteGene(comms: widget.comms,))
     //Tab(text: Text("Statistiques générales"), body: StatistiquesGenerales()),
     ]
       ),

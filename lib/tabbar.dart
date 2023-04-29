@@ -28,6 +28,10 @@ class _NavBarTabState extends State<NavBarTab> {
   Widget build(BuildContext context) {
     return  NavigationView(
       content: TabView(
+footer: Padding(
+  padding: const EdgeInsets.all(8.0),
+  child:   Icon(FluentIcons.settings, size: 25, fill: 1, color: Colors.black,),
+),
         closeButtonVisibility: CloseVision,
           currentIndex: currentIndex,
           onChanged: (index) => setState(() => currentIndex = index),

@@ -1,8 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:phil/methods/methods.dart';
-import 'package:phil/models/commerciaux.dart';
+import 'package:phil/models/model_commerciaux.dart';
 import 'package:phil/pages/CommsTab.dart';
-import 'package:phil/pages/page_detail_commerciaux.dart';
 import 'package:phil/provider/queries_provider.dart';
 
 class PageCommerciaux extends StatefulWidget {
@@ -37,7 +36,8 @@ class _PageCommerciauxState extends State<PageCommerciaux> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-      header: const PageHeader(title: Text("Nos commerciaux"),),
+      header: const PageHeader(title: Text("Nos commerciaux"),
+      ),
         content:
          builWidget(),
     );

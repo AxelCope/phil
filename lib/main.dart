@@ -33,7 +33,9 @@ class _MyMainState extends State<MyMain> {
       {
         ProgressRing();
       }
-    return  FluentApp( debugShowCheckedModeBanner: false, home: NavBarTab());
+    return  FluentApp(
+themeMode: ThemeMode.dark,
+        debugShowCheckedModeBanner: false, home: NavBarTab());
   }
   Future<void> _initGenos() async {
     Genos.instance
