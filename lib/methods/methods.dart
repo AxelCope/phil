@@ -14,7 +14,7 @@ Future nextPage(BuildContext context, Widget page) async {
 }
 
 
-Future backToPage(BuildContext context) async {
+Future previousPage(BuildContext context) async {
   Navigator.pop(context);
 }
 

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart' hide showDialog;
+import 'package:phil/methods/methods.dart';
 import 'package:phil/models/model_commerciaux.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:phil/models/model_segmentation.dart';
@@ -245,8 +246,9 @@ class _ActiviteGeneState extends State<ActiviteGene> {
           ListTile.selectable(
             onPressed: (){
                listUnivers.clear();
-               fetchUnivers(id: dt.id);
-               showInformationDialog(context, dt.id, dt.nom);
+               fetchUniversWithDialog(id: dt.id, nom: dt.nom);
+               // fetchUnivers(id: dt.id);
+               // showInformationDialog(context, dt.id, dt.nom);
               },
             title: Text("${dt.nom} (${dt.id}) : ${formatter.format(dt.somme)} CFA",
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -589,8 +591,50 @@ class _ActiviteGeneState extends State<ActiviteGene> {
     );
   }
 
-  Future<void> fetchUnivers({id})
-  async{
+
+  Future<void> fetchUniversWithDialog({id, nom}) async{
+       showDialog(
+          context: context,
+          builder: (context){
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 180.0),
+                child: SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: ProgressRing(),
+                ),
+              ),
+            );
+          }
+      );
+
+    await _provider.fetchUnivers(
+        pdvId: id,
+        secure: false,
+        onSuccess: (data)
+        {
+          for(var emt in data)
+          {
+            listUnivers.add(Univers.mapUnivers(emt));
+          }
+          setState(() {
+            gotDialogData = false;
+          });
+          // Remove the progress dialog
+          previousPage(context);
+          showInformationDialog(context, id, nom);
+        },
+        onError: (onError) {
+          // Remove the progress dialog
+          previousPage(context);
+          showAboutDialog(context: context);
+          print(onError);
+        }
+    );
+  }
+
+  Future<void> fetchUnivers({id}) async{
     await _provider.fetchUnivers(
         pdvId: id,
         secure: false,
