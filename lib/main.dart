@@ -1,13 +1,11 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:genos_dart/genos_dart.dart';
-import 'package:phil/navbar.dart';
-import 'package:phil/pages/test.dart';
 import 'package:phil/tabbar.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(create: (BuildContext context) {  },
-  child: const MyMain(),));
+    child: const MyMain(),));
 }
 
 class MyMain extends StatefulWidget {
@@ -30,12 +28,11 @@ class _MyMainState extends State<MyMain> {
   @override
   Widget build(BuildContext context) {
     if(!_genosInit)
-      {
-        ProgressRing();
-      }
-    return  FluentApp(
-themeMode: ThemeMode.dark,
-        debugShowCheckedModeBanner: false, home: NavBarTab());
+    {
+      ProgressRing();
+    }
+    return const FluentApp(
+         debugShowCheckedModeBanner: false, home: NavBarTab());
   }
   Future<void> _initGenos() async {
     Genos.instance
@@ -56,7 +53,7 @@ themeMode: ThemeMode.dark,
   }
 
   void showContentDialog(BuildContext context) async {
-     showDialog<String>(
+    showDialog<String>(
       context: context,
       builder: (context) => const ContentDialog(
         title: Text("Connexion au serveur..."),

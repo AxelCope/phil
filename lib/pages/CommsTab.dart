@@ -2,9 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:phil/models/model_commerciaux.dart';
 import 'package:phil/pages/comm_detailsTabs/details_activite.dart';
 import 'package:phil/pages/comm_detailsTabs/details_reconversion.dart';
-import 'package:phil/pages/page_commerciaux.dart';
 import 'package:phil/pages/comm_detailsTabs//details_dotations.dart';
-import 'package:phil/pages/page_pointdeventes.dart';
 
 class CommsTab extends StatefulWidget {
   const CommsTab({
@@ -17,16 +15,15 @@ class CommsTab extends StatefulWidget {
 }
 
 class _CommsTabState extends State<CommsTab> {
-  CloseButtonVisibilityMode CloseVision = CloseButtonVisibilityMode.never;
+  CloseButtonVisibilityMode  closeVision = CloseButtonVisibilityMode.never;
   int currentIndex = 0;
-  Icon ic = Icon(FluentIcons.bar_chart4);
+  Icon ic = const Icon(FluentIcons.bar_chart4);
 
   @override
   Widget build(BuildContext context) {
     return NavigationView(
       content: TabView(
-
-          closeButtonVisibility: CloseVision,
+          closeButtonVisibility: closeVision,
           currentIndex: currentIndex,
           onChanged: (index) => setState(() => currentIndex = index),
           tabs: <Tab> [
@@ -45,9 +42,9 @@ class _CommsTabState extends State<CommsTab> {
                   TextSpan(text: 'Courbe des reconversion    '),
                   WidgetSpan(child: Icon(FluentIcons.bar_chart4)),
 
-                ],
-              ),
-            ), body: DetailsReconversion(comms: widget.comms,)),
+                 ],
+               ),
+             ), body: DetailsReconversion(comms: widget.comms,)),
             Tab(text: const Text.rich(
               TextSpan(
                 children: [
@@ -57,9 +54,8 @@ class _CommsTabState extends State<CommsTab> {
                 ],
               ),
             ), body: ActiviteGene(comms: widget.comms,))
-    //Tab(text: Text("Statistiques générales"), body: StatistiquesGenerales()),
-    ]
+     ]
       ),
-    );;
+    );
   }
 }

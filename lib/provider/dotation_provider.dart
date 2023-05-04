@@ -24,14 +24,15 @@ class DotationProvider {
     required ValueChanged<RequestError> onError,
     bool secure = true,
   }) async {
+    print('dotation provider ${DateTime.now()}');
     await GDirectRequest.select(
+
         sql: "SELECT COUNT(distinct(TO_POS_NAME)) as dotreg, CAST(TIMESTAMP AS DATE) AS jours "
             "FROM pso "
-            "WHERE DATE(TIMESTAMP) >= '$startDate' AND DATE(TIMESTAMP) <= '$endDate'  AND FRMSISDN = '$commId' "
+            "WHERE DATE(TIMESTAMP) >= ? AND DATE(TIMESTAMP) <= ?  AND FRMSISDN = ? "
             "AND TOMSISDN IN (SELECT NUMERO_FLOOZ FROM univers) "
-            "GROUP BY jours;"
-
-
+            "GROUP BY jours;",
+      values: [startDate, endDate, commId]
     ).exec(
         secure: secure,
         onSuccess: (Result result) {

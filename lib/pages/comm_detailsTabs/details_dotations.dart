@@ -34,7 +34,7 @@ class _DetailsDotationsState extends State<DetailsDotations> {
 
   DateTime dt = DateTime.now().subtract(Duration(days: 7));
 
-  late String holDate = "${dt.year}-${dt.month}-${dt.day}";
+  late String holDate = "${widget.comms.startDateTime!.year}-${widget.comms.startDateTime!.month}-${widget.comms.startDateTime!.day}";
   String holDate2 = "${DateTime.now()}";
   int? selected;
 
@@ -51,7 +51,6 @@ class _DetailsDotationsState extends State<DetailsDotations> {
     rv = await ReconversionProvider.instance;
     _provider = await QueriesProvider.instance;
     _fetchData();
-    _fetchDataRec();
   }
 
   @override
@@ -125,23 +124,6 @@ class _DetailsDotationsState extends State<DetailsDotations> {
     return "$day-$month-$year";
   }
 
-
-  Future<void> _fetchDataRec() async {
-    rv.getAllReconversion(
-      //TODO set this to true
-        startDate: holDate,
-        endDate: holDate2,
-        commId: widget.comms.id,
-        secure: false,
-        onSuccess: (r) {
-          setState(() {
-            reconversion = r;
-          });
-        },
-        onError: (e) {
-          print(e);
-        });
-  }
 
   List<ChartSeries<dynamic, dynamic>> gotCHarts()
    {
@@ -225,6 +207,7 @@ class _DetailsDotationsState extends State<DetailsDotations> {
           setState(() {
             ListDotations = r;
           });
+          print(holDate);
           setState(() {
             gotData = false;
             getDataError = false;

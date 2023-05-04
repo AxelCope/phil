@@ -14,7 +14,7 @@ import 'package:phil/models/model_univers.dart';
 import 'package:phil/models/univers_total.dart';
 import 'package:phil/provider/queries_provider.dart';
 import 'package:phil/widget/CardHiglight.dart';
-import 'package:syncfusion_flutter_xlsio/xlsio.dart' hide Column;
+import 'package:syncfusion_flutter_xlsio/xlsio.dart' hide Column, Row;
 
 class ActiviteGene extends StatefulWidget {
   const ActiviteGene({Key? key,     required this.comms
@@ -49,8 +49,10 @@ class _ActiviteGeneState extends State<ActiviteGene> {
 
   //Variables pour la progress
   bool gotData = true;
+  bool gotDataSegment = true;
   bool getDataError = false;
   bool gotDialogData = true;
+  bool gotCountData = true;
 
    late final QueriesProvider _provider;
 
@@ -64,9 +66,9 @@ class _ActiviteGeneState extends State<ActiviteGene> {
   //Initalisation du provider
   void _initProvider() async {
     _provider = await QueriesProvider.instance;
+    inactifsCommercialExcel();
     countUniversPdvs();
     getInactifs();
-    inactifsCommercialExcel();
     segmentation();
     fetchUnivers();
 
@@ -79,52 +81,63 @@ class _ActiviteGeneState extends State<ActiviteGene> {
       content: ScaffoldPage.scrollable(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                children: [
-                  SizedBox(width: 300, child: cardInactifs()),
-                  SizedBox(width: 300, child: cardActifs()),
-
-                  Container(
-                    padding: const EdgeInsets.only(top: 15),
-                    width: 500,
-                      height: 100,
-                      child: const Card(child: ProgressBar(value: 40,)))
-                ],
-              ),
+              padding: const EdgeInsets.all(20.0),
+              child: Wrap(children: [ SizedBox(width: 300, child: cardInactifs()),
+                SizedBox(width: 300, child: cardActifs()),
+                Container(
+                    width: 400,
+                    padding: const EdgeInsets.only(top: 10),
+                    child:   Card(
+                      child: ListTile(
+                        title:Text("Progression de ${widget.comms.nomCommerciaux} sur son objectif mensuel", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top:15.0),
+                          child: Row(
+                            children: const [
+                              ProgressBar(value: 40,),
+                              SizedBox(width: 10,),
+                              Text("80% (300.000 CFA/600.000)")
+                            ],
+                          ),
+                        ),
+                      ),
+                    ))],),
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text("Segmentation des points du commercial", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w200),),
+             Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("Segmentation des points de ${widget.comms.nomCommerciaux} (Nombre de pdvs: ${nbpdvs()})", style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w200),),
             ),
 
             //Widgets segmentation
             allSegments(),
-
-              Container(
-                width: 100,
-                height: 100,
-                child: listInfosPdv(),
-              )
-
           ]),
     );
   }
 
-  //Récupération des inactifs du commercial
-  Future<void>inactifsCommercialExcel([bool rebuild = true]) async {
+   nbpdvs()
+  {
+    if(gotCountData)
+      {
+        return "0";
+      }
+    return "${listCountUnivers.first.pdv_zone!}";
+  }
 
+  //Récupération des inactifs du commercial
+  Future<void>inactifsCommercialExcel([bool rebuild = true]) async
+  {
     await _provider.fetchInactifsZone(
         cmId: widget.comms.id,
-        startDate: "04",
-        endDate: "04",
+        startDate: DateTime.now().month,
         secure: false,
         onSuccess: (cms) {
           for (var element in cms) {
+            print(element);
             inactivite.add(InactifsDistincts.MapInactifs(element));
           }
         },
         onError: (error) {
+          print(error);
         }
     );
   }
@@ -262,7 +275,7 @@ class _ActiviteGeneState extends State<ActiviteGene> {
   //Recuperation et repartition des pdvs selon leurs segments
   Future<void> segmentation([bool rebuild = true]) async {
     setState(() {
-      gotData = true;
+      gotDataSegment = true;
       getDataError = false;
     });
     await _provider.Segmentation(
@@ -290,6 +303,10 @@ class _ActiviteGeneState extends State<ActiviteGene> {
               zoneE.add(Segmentation.MapDepot(element));
             }
           }
+          setState(() {
+            gotDataSegment = true;
+
+          });
         },
         onError: (error) {
         }
@@ -298,20 +315,9 @@ class _ActiviteGeneState extends State<ActiviteGene> {
 
   //Widget pour les card du taux d'ativite et d'inactivite du reseau
   Widget cardActifs() {
-    if (gotData) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 100.0),
-          child: SizedBox(
-            height: 100,
-            width: 100,
-            child: ProgressRing(),
-          ),
-        ),
-      );
-    }
+
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListView.builder(
           shrinkWrap: true,
           itemCount: listInact.length,
@@ -323,68 +329,55 @@ class _ActiviteGeneState extends State<ActiviteGene> {
   }
 
   Widget cardInactifs() {
-    if (gotData) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 180.0),
-          child: SizedBox(
-            height: 100,
-            width: 100,
-            child: ProgressRing(),
-          ),
-        ),
-      );
-    }
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: listInact.length,
-          itemBuilder: (BuildContext c, int index) {
-            return showInactifs(listInact[index], listCountUnivers[index]);
-          }
-      ),
-    );
-  }
 
-  Widget showInactifs(Inactifs inac, countUnivers uni) {
-    double tauxActivite = ((inac.inactifs! * 100) / uni.pdv_zone!);
-
-    if (gotData) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 100.0),
-          child: SizedBox(
-            height: 100,
-            width: 100,
-            child: ProgressRing(),
-          ),
-        ),
-      );
-    }
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Button(
+        onPressed: (){
+          cardDialog(context);
+        },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
               const Text("Taux d'inactivité", style: TextStyle(fontSize: 25)),
-              Text("${tauxActivite.toStringAsFixed(1)}%",
-                style: TextStyle(fontSize: 50, color: Colors.red),),
+              ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: listInact.length,
+                  itemBuilder: (BuildContext c, int index) {
+                    return showInactifs(listInact[index], listCountUnivers[index]);
+                  }
+              ),
             ],
           ),
         ),
-        onPressed: () => cardDialog(context),
       ),
+    );
+  }
+
+  Widget showInactifs(Inactifs inac, countUnivers uni) {
+    if ( listInact.isEmpty && listCountUnivers.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child:  SizedBox(
+            width: 150,
+            child: ProgressBar(),
+          ),
+        ),
+      );
+    }
+    double tauxActivite = ((inac.inactifs! * 100) / uni.pdv_zone!);
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text("${tauxActivite.toStringAsFixed(1)}%",
+        style: TextStyle(fontSize: 50, color: Colors.red),),
     );
   }
 
   Widget showActifs(Inactifs inac, countUnivers uni) {
     double tauxActivite = ((inac.inactifs! * 100) / uni.pdv_zone!);
     double tauxInactivite = 100 - tauxActivite;
-
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Button(
@@ -406,8 +399,7 @@ class _ActiviteGeneState extends State<ActiviteGene> {
   //Recuperation du nombre total d'univers
   Future<void> countUniversPdvs([bool rebuild = true]) async {
     setState(() {
-      gotData = true;
-      getDataError = false;
+      gotCountData = true;
     });
     await _provider.Pdvszones(
         cmId: widget.comms.id,
@@ -418,15 +410,11 @@ class _ActiviteGeneState extends State<ActiviteGene> {
           }
 
           setState(() {
-            gotData = false;
-            getDataError = false;
+            gotCountData = false;
           });
         },
         onError: (error) {
-          setState(() {
-          gotData = false;
-          getDataError = true;
-        });
+
         }
     );
   }
@@ -435,7 +423,6 @@ class _ActiviteGeneState extends State<ActiviteGene> {
 //Envoyer les inactifs au commerciaux respectifs
   void cardDialog(BuildContext context) async {
       await showDialog<String>(
-
       context: context,
       builder: (context) =>
           ContentDialog(
@@ -488,7 +475,9 @@ class _ActiviteGeneState extends State<ActiviteGene> {
 
 
   Future<void> getInactifs([bool rebuild = true]) async {
-
+setState(() {
+  gotData = true;
+});
     await _provider.fetchActifsZone(
         cmId: widget.comms.id,
         startDate: DateTime.now().month,
@@ -498,7 +487,9 @@ class _ActiviteGeneState extends State<ActiviteGene> {
           for (var element in cms) {
             listInact.add(Inactifs.MapInactifs(element));
           }
-
+          setState(() {
+            gotData = false;
+          });
         },
         onError: (error) {
         }
@@ -508,7 +499,7 @@ class _ActiviteGeneState extends State<ActiviteGene> {
 
   String noms(InactifsDistincts ina)
   {
-    return ina.nom_pdv!;
+    return ina.nom_pdv! ;
   }
  int numero(InactifsDistincts ina)
   {
@@ -551,24 +542,6 @@ class _ActiviteGeneState extends State<ActiviteGene> {
   }
 
   void showInformationDialog(BuildContext context,id, nom) {
-  //   if (gotDialogData)
-  // {
-  //    showDialog(
-  //       context: context,
-  //       builder: (context){
-  //         return Center(
-  //           child: Padding(
-  //             padding: EdgeInsets.symmetric(vertical: 180.0),
-  //             child: SizedBox(
-  //               height: 100,
-  //               width: 100,
-  //               child: ProgressRing(),
-  //             ),
-  //           ),
-  //         );
-  //       }
-  //   );
-  // }
 
        showDialog<String>(
       context: context,
@@ -577,7 +550,7 @@ class _ActiviteGeneState extends State<ActiviteGene> {
         return StatefulBuilder(
           builder: (context, setState){
             return ContentDialog(
-              title: Text("Infos du point"),
+              title: const Text("Infos du point"),
               content: listInfosPdv(id: id, nom: nom),
               actions: [
                 FilledButton(
@@ -596,7 +569,7 @@ class _ActiviteGeneState extends State<ActiviteGene> {
        showDialog(
           context: context,
           builder: (context){
-            return Center(
+            return const Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 180.0),
                 child: SizedBox(
@@ -629,12 +602,12 @@ class _ActiviteGeneState extends State<ActiviteGene> {
           // Remove the progress dialog
           previousPage(context);
           showAboutDialog(context: context);
-          print(onError);
         }
     );
   }
 
   Future<void> fetchUnivers({id}) async{
+
     await _provider.fetchUnivers(
         pdvId: id,
         secure: false,
@@ -661,13 +634,13 @@ class _ActiviteGeneState extends State<ActiviteGene> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Nom du point:  ${nom}", style: TextStyle(fontWeight: FontWeight.bold),),
-        SizedBox(height: 9,),
-        Text("Numero du point:  ${id}", style: TextStyle(fontWeight: FontWeight.bold)),
-        SizedBox(height: 9,),
-        Text("Profil:  ${uni.profil!}", style: TextStyle(fontWeight: FontWeight.bold)),
-        SizedBox(height: 9,),
-        Text("Localisation:  ${uni.localisation!}", style: TextStyle(fontWeight: FontWeight.bold)),
+        Text("Nom du point:  $nom", style: const TextStyle(fontWeight: FontWeight.bold),),
+        const SizedBox(height: 9,),
+        Text("Numero du point:  $id", style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 9,),
+        Text("Profil:  ${uni.profil!}", style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 9,),
+        Text("Localisation:  ${uni.localisation!}", style: const TextStyle(fontWeight: FontWeight.bold)),
 
         Center(
           child: Padding(

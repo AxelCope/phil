@@ -21,7 +21,7 @@ class _DetailsReconversionState extends State<DetailsReconversion> {
   bool gotData = true;
   bool getDataError = false;
   DateTime dt = DateTime.now().subtract(Duration(days: 7));
-  late String holDate = "${dt.year}-${dt.month}-${dt.day}";
+  late String holDate = "${widget.comms.startDateTime!.year}-${widget.comms.startDateTime!.month}-${widget.comms.startDateTime!.day}";
   String holDate2 = "${DateTime.now()}";
   late final QueriesProvider _provider;
   int? selected;

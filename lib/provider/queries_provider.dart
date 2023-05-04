@@ -216,19 +216,16 @@ class QueriesProvider {
   Future<void> fetchInactifsZone({
     required cmId,
     required startDate,
-    required endDate,
     required Function(List<Map<String, dynamic>>) onSuccess,
     required Function(RequestError) onError,
     bool secure = true
   }) async {
     GDirectRequest.select(
       sql:
-        "SELECT  NUMERO_FLOOZ as id, NOM_DU_POINT as nom "
-            "FROM univers "
-        "WHERE numero_cagnt = $cmId AND NUMERO_FLOOZ NOT IN (SELECT frmsisdn FROM pso WHERE MONTH(TIMESTAMP) >= '$startDate' ) "
-    "OR NUMERO_FLOOZ NOT IN (SELECT tomsisdn FROM pso WHERE MONTH(TIMESTAMP) >= '$endDate') "
-    "AND COMMERCIAL != 'ODETTE' AND COMMERCIAL != 'DG' AND COMMERCIAL != 'SANDRA' AND NUMERO_FLOOZ = 22896373764 "
-      "ORDER BY COMMERCIAL"
+        "SELECT NOM_DU_POINT as nom, NUMERO_FLOOZ as id "
+        "FROM univers "
+            "WHERE (NUMERO_FLOOZ NOT IN (SELECT frmsisdn FROM pso WHERE MONTH(TIMESTAMP) = '$startDate' ) AND NUMERO_FLOOZ NOT IN (SELECT tomsisdn FROM pso WHERE DATE(TIMESTAMP) = '$startDate')) "
+      "AND numero_cagnt =  $cmId; "
     ,
     ).exec(
         secure: secure,
@@ -241,6 +238,7 @@ class QueriesProvider {
 
   Future<void> fetchUnivers({
     required pdvId,
+    id,
     required Function(List<Map<String, dynamic>>) onSuccess,
     required Function(RequestError) onError,
     bool secure = true
